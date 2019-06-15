@@ -81,8 +81,7 @@ function nextScene(){
   drawList.length = 0;
   functionList.length = 0;
   addToLists();
-  // sounds[3].play();
-  jemoeder
+  sounds[3].play();
 }
 
 function addToLists(){
@@ -122,7 +121,7 @@ function draw(){
   }
   // fill("black");
   // rect(1225,923,120,140);
-  sounds[3].play();
+  // sounds[3].play();
 }
 
 function render(obj){
