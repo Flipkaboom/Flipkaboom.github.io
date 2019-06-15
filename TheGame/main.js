@@ -178,7 +178,7 @@ function addToLists(){
     try{
       scenes[scene][property].addLists();
     }
-    catch(){
+    catch(error){
 
     }
   }
