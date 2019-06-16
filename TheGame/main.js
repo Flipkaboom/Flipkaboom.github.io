@@ -2,7 +2,7 @@
 function preload() {
   images = [];
   images.length = 0;
-  for(var i = 0; i < 23;  i++){
+  for(var i = 0; i < 75;  i++){
     images.push(loadImage("images/" + i + ".png"));
   }
   sounds = [];
@@ -17,75 +17,94 @@ function setup(){
   canvas = createCanvas(1920,1080);
   angleMode(DEGREES);
   frameRate(60);
-  scene = 0;
+  scene = "arcade";
   drawList = [];
   functionList = [];
   animList = [];
   frames = 0;
-  setInterval(geluidScene1,1000);
 
 //array
 
-  scenes = []
-    scenes[0] = {
+  scenes = [];
+    scenes.arcade = {
       background:images[0],
       coinBagFunction(){
         if(this.hover == true){
           this.invisible = false;
-          scenes[0].coin.invisible = false;
+          scenes.arcade.coin.invisible = false;
           sounds[2].play();
         }
         if(this.hover == false){
           this.invisible = true;
-          if(scenes[0].coin.x > this.x && scenes[0].coin.x < this.x + this.width ){
-            scenes[0].coin.invisible = true;
+          if(scenes.arcade.coin.x > this.x && scenes.arcade.coin.x < this.x + this.width ){
+            scenes.arcade.coin.invisible = true;
           }
         }
       },
-      startButton:new Item(751,424,images[3],function(){if(frames == 0){this.invisible = false; geluidScene1();}else if(frames == 30){this.invisible = true;}},0,0,false,0,0)
-    }
+      startButton:new Item(751,424,images[3],function(){if(frames == 0){this.invisible = false; sounds[1].play();}else if(frames == 30){this.invisible = true;}},0,0,false,0,0,255)
+    };
 //beginscene------------------------------------------------------------------
-    scenes[0].coinBag = new MouseHover(1515,249,images[2],scenes[0].coinBagFunction,333,505,true,0,0);
-    scenes[0].coin = new Draggable(1688,619,images[1],0,0,true,function(){if(this.x + (0.5*this.width) < scenes[0].coinBag.x || this.x + this.width > scenes[0].coinBag.x + scenes[0].coinBag.width || this.y < scenes[0].coinBag.y || this.y + this.height > scenes[0].coinBag.y + scenes[0].coinBag.height){this.invisible = false;}},0,0);
-    scenes[0].coinslot = new Target(1225,923,0,function(){nextScene();},scenes[0].coin,120,140,0,0);
+    scenes.arcade.coinBag = new MouseHover(1515,249,images[2],scenes.arcade.coinBagFunction,333,505,true,0,0,255);
+    scenes.arcade.coin = new Draggable(1688,619,images[1],0,0,true,function(){if(this.x + (0.5*this.width) < scenes.arcade.coinBag.x || this.x + this.width > scenes.arcade.coinBag.x + scenes.arcade.coinBag.width || this.y < scenes.arcade.coinBag.y || this.y + this.height > scenes.arcade.coinBag.y + scenes.arcade.coinBag.height){this.invisible = false;}},0,0,255);
+    scenes.arcade.coinslot = new Target(1225,923,0,function(){nextScene("opening");},scenes.arcade.coin,120,140,0,0,255);
 //----------------------------------------------------------------------------
-    scenes[1] = {
+    scenes.opening = {
+      background:images[23]
+    };
+
+    scenes.opening.intro = new Item(0,-80,images[23],function(){if(this.currentImg == 48 && this.animTimer > 0){this.animTimer = -1000; setTimeout(nextScene,1000,"desert");}},0,0,false,25,8,255);
+//----------------------------------------------------------------------------
+
+  scenes.desert = {
+    background:images[49]
+  };
+  scenes.desert.pump = new Item(0,0,images[55],function(){if(this.active != true){this.animTimer = 0;}},0,0,false,7,10,255);
+  scenes.desert.oil = new Item(1406,663,images[52],0,0,0,true,2,5,225);
+  scenes.desert.lever = new Clickable(1672,407,images[51],function(){this.image = images[50]; scenes.desert.pump.active = true;setTimeout(function(){scenes.desert.oil.invisible = false;},1500); setTimeout(function(){scenes.desert.oilBarrelFalling.invisible = false;},2300); setTimeout(function(){scenes.desert.arrow.invisible = false;},700);},0,0,false,0,0,255);
+  scenes.desert.oilBarrelFalling = new Item(1627,-362,images[69],function(){if(this.invisible == false && this.y < 662){this.y += 30;}else if(this.invisible == false){this.invisible = true; scenes.desert.oilBarrel.invisible = false;}},0,0,true,0,0,255);
+  scenes.desert.oilBarrel = new Draggable(1627,690,images[69],0,0,true,function(){if(this.invisible == true){this.x = 1627; this.y = 690;}},0,0,255);
+  scenes.desert.oilBarrelRefinery = new Item(1254,606,images[63],function(){if(this.invisible == true){this.animTimer = -1;}else if(this.currentImg == 68){this.animTimer = -1; setTimeout(function(){scenes.desert.arrowNext.invisible = false;},2000);}},0,0,true,5,10,255);
+  scenes.desert.arrow = new Item(1152,796,images[70],function(){if(this.invisible == true){this.animTimer = 0;}},0,0,true,3,10,255);
+  scenes.desert.refineryStation = new Target(1255,611,0,function(){scenes.desert.oilBarrelRefinery.invisible = false; scenes.desert.oilBarrel.invisible = true;},scenes.desert.oilBarrel,256,351,false,0,0,255);
+  scenes.desert.arrowNext = new Clickable(1734,938,images[74],function(){nextScene("distillation");},0,0,true,0,0,255);
+//----------------------------------------------------------------------------
+    scenes.distillation = {
       background:images[4]
-    }
-    scenes[1].oilBarrel = new Draggable(1566,665,images[6],0,0,0,false,0,0);
-    scenes[1].destillationTower = new Item(55,49,images[15],0,0,0,true,1,120);
-    scenes[1].ovenOn = new Item(763,734,images[8],0,0,0,true,2,5);
-    scenes[1].smoke = new Item (966,0,images[11],0,0,0,true,3,10);
-    scenes[1].refineryStation = new Target(1147,600,0,function(){furnaceOn();},scenes[1].oilBarrel,256,351,false,0,0);
-    scenes[1].arrow = new Item(1082,774,images[18],0,0,0,true,3,10);
-    scenes[1].arrow2 = new Item(523,628,images[18],0,0,0,true,3,10);
-    scenes[1].info = new Item(476,23,images[22],0,0,0,true,0,0);
-    scenes[1].pijl = new Clickable(30,938,images[7],function(){clickedOnArrow();},0,0,true,0,0);
+    };
+    scenes.distillation.oilBarrel = new Draggable(1566,665,images[6],0,0,false,0,0,0,255);
+    scenes.distillation.destillationTower = new Item(55,49,images[15],function(){if(this.invisible != true && this.opacity < 250){this.opacity += 10; console.log("hi");}else if(this.opacity == 250){this.opacity = 255;}},0,0,true,1,120,50);
+    scenes.distillation.ovenOn = new Item(763,734,images[8],0,0,0,true,2,5,255);
+    scenes.distillation.smoke = new Item (966,0,images[11],0,0,0,true,3,10,255);
+    scenes.distillation.refineryStation = new Target(1147,600,0,function(){if(this.toggled != true){furnaceOn(); this.toggled = true;}},scenes.distillation.oilBarrel,256,351,false,0,0,255);
+    scenes.distillation.arrow = new Item(1082,774,images[18],function(){if(this.invisible == true){this.animTimer = 0;}},0,0,true,3,10,255);
+    scenes.distillation.arrow2 = new Item(523,628,images[18],function(){if(this.invisible == true){this.animTimer = 0;}},0,0,true,3,10,255);
+    scenes.distillation.info = new Item(476,-465,images[22],function(){if(this.y < 23 && this.invisible != true){this.y += 20;}},0,0,true,0,0,255); //23
+    scenes.distillation.pijl = new Clickable(30,938,images[7],function(){nextScene();},0,0,true,0,0,255);
 //2e scene---------------------------------------------------------------------
 scenes[2] = {
   background:images[1]
 }
-  // scenes[2].molecule[0] = new Draggable(x,y,i,w,h,inv,f,a,as);
-  // scenes[2].molecule[1] = new Draggable(x,y,i,w,h,inv,f,a,as);
-  // scenes[2].molecule[2] = new Draggable(x,y,i,w,h,inv,f,a,as);
-  // scenes[2].molecule[3] = new Draggable(x,y,i,w,h,inv,f,a,as);
-  // scenes[2].molecule[4] = new Draggable(x,y,i,w,h,inv,f,a,as);
-  // scenes[2].molecule[5] = new Draggable(x,y,i,w,h,inv,f,a,as);
-  // scenes[2].molecule[6] = new Draggable(x,y,i,w,h,inv,f,a,as);
-  // scenes[2].molecule[7] = new Draggable(x,y,i,w,h,inv,f,a,as);
-  // scenes[2].molecule[8] = new Draggable(x,y,i,w,h,inv,f,a,as);
-  // scenes[2].molecule[9] = new Draggable(x,y,i,w,h,inv,f,a,as);
+  // scenes[2].molecule[0] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
+  // scenes[2].molecule[1] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
+  // scenes[2].molecule[2] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
+  // scenes[2].molecule[3] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
+  // scenes[2].molecule[4] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
+  // scenes[2].molecule[5] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
+  // scenes[2].molecule[6] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
+  // scenes[2].molecule[7] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
+  // scenes[2].molecule[8] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
+  // scenes[2].molecule[9] = new Draggable(x,y,i,w,h,inv,f,a,as,o);
 
-  // scenes[2].target[0] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
-  // scenes[2].target[1] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
-  // scenes[2].target[2] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
-  // scenes[2].target[3] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
-  // scenes[2].target[4] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
-  // scenes[2].target[5] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
-  // scenes[2].target[6] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
-  // scenes[2].target[7] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
-  // scenes[2].target[8] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
-  // scenes[2].target[9] = new Item(x,y,i,function(){snap();},50,50,true,0,0);
+  // scenes[2].target[0] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
+  // scenes[2].target[1] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
+  // scenes[2].target[2] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
+  // scenes[2].target[3] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
+  // scenes[2].target[4] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
+  // scenes[2].target[5] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
+  // scenes[2].target[6] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
+  // scenes[2].target[7] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
+  // scenes[2].target[8] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
+  // scenes[2].target[9] = new Item(x,y,i,function(){snap();},50,50,true,0,0,o);
 
 
 
@@ -97,11 +116,11 @@ scenes[2] = {
 //3e scene----------------------------------------------------------------------
 
 
-    //MouseHover (x,y,i,f,w,h,inv,a,as)
-    //Clickable (x,y,i,f,w,h,inv,a,as)
-    //Draggable (x,y,i,w,h,inv,f,a,as)
-    //Target (x,y,i,f,r,w,h,inv,a,as)
-    //Item (x,y,i,f,w,h,inv,a,as)
+    //MouseHover (x,y,i,f,w,h,inv,a,as,o)
+    //Clickable (x,y,i,f,w,h,inv,a,as,o)
+    //Draggable (x,y,i,w,h,inv,f,a,as,o)
+    //Target (x,y,i,f,r,w,h,inv,a,as,o)
+    //Item (x,y,i,f,w,h,inv,a,as,o)
 
     addToLists();
 
@@ -118,58 +137,58 @@ scenes[2] = {
  //   }
 
 
-function clickedOnArrow(){
-  nextScene();
-}
-
 function furnaceOn(){
-  scenes[1].background = images[5];
-  scenes[1].oilBarrel.invisible = true;
+  scenes.distillation.background = images[5];
+  scenes.distillation.oilBarrel.invisible = true;
   setTimeout(furnaceOn15,300);
 }
 function furnaceOn15(){
-  scenes[1].arrow.invisible = false;
+  scenes.distillation.arrow.invisible = false;
   setTimeout(furnaceOn2,700);
 }
 
 function furnaceOn2(){
   sounds[4].play();
-  scenes[1].ovenOn.invisible = false;
+  scenes.distillation.ovenOn.invisible = false;
 
   setTimeout(furnaceOn25,300);
 }
 function furnaceOn25(){
-    scenes[1].smoke.invisible = false;
+    scenes.distillation.smoke.invisible = false;
   setTimeout(furnaceOn26,900);
 }
 function furnaceOn26(){
-  scenes[1].arrow2.invisible = false;
+  scenes.distillation.arrow2.invisible = false;
   setTimeout(furnaceOn3,1100);
 }
 
 function furnaceOn3(){
-  scenes[1].destillationTower.invisible = false;
+  scenes.distillation.destillationTower.currentImg = scenes.distillation.destillationTower.startImage;
+  scenes.distillation.destillationTower.invisible = false;
   setTimeout(furnaceOn35,3000);
 }
 function furnaceOn35(){
-  scenes[1].info.invisible = false;
+  scenes.distillation.info.invisible = false;
   setTimeout(furnaceOn4,3000);
 }
 
 function furnaceOn4(){
-  scenes[1].pijl.invisible = false;
+  scenes.distillation.pijl.invisible = false;
 }
 
 
-function nextScene(){
+function nextScene(a){
+  scenes[scene].background = images[17];
   drawList.length = 0;
   functionList.length = 0;
-  scenes[scene].background = images[17];
-  setTimeout(nextScene2,500);
+  setTimeout(nextScene2,500,a);
 }
-function nextScene2(){
-  scene++;
+function nextScene2(a){
+  scene = a;
   addToLists();
+  for(var i = 0; i < sounds.length; i++){
+    sounds[i].pause();
+  }
   sounds[3].play();
 }
 
@@ -184,23 +203,15 @@ function addToLists(){
   }
 }
 
-  function geluidScene1(){
-    if (scene == 0) {
-      sounds[1].play();
-
-    }
-  }
-
   function achtergrondMuziek() {
-
     if (scene > 0 ) {
       sounds[0].play();
     }
   }
 
 function animationFunction(){
-    console.log(this.animTimer);
-if(this.animSpeed < this.animTimer){
+    // if(this.animLength == 1){console.log(this.animTimer);}
+if(this.animTimer > this.animSpeed){
 
   this.currentImg++;
   this.animTimer = 0;
@@ -219,10 +230,10 @@ function draw(){
     frames = 0;
   }
 
-  background(scenes[scene].background);
   for(var i = 0; i < functionList.length; i++){
       functionList[i].loop();
   }
+  background(scenes[scene].background);
   for(var i = 0; i < drawList.length; i++){
       render(drawList[i]);
   }
@@ -236,7 +247,12 @@ function draw(){
 
 function render(obj){
   if(obj.invisible != true){
+    push();
+    if(obj.opacity != 255){
+      tint(255,obj.opacity);
+    }
     image(obj.image,obj.x,obj.y);
+    pop();
   }
 }
 
@@ -261,7 +277,7 @@ function addLists(obj){
 }
 //class
 class MouseHover{
-  constructor(x,y,i,f,w,h,inv,a,as){
+  constructor(x,y,i,f,w,h,inv,a,as,o){
     this.x = x;
     this.y = y;
     this.image = i;
@@ -270,6 +286,7 @@ class MouseHover{
     this.hover = false;
     this.animLength = a;
     this.animSpeed = as;
+    this.opacity = o;
     if(this.image != 0){
       this.width = this.image.width;
       this.height = this.image.height;
@@ -293,7 +310,7 @@ class MouseHover{
 }
 
 class Clickable{
-  constructor(x,y,i,f,w,h,inv,a,as){
+  constructor(x,y,i,f,w,h,inv,a,as, o){
     this.x = x;
     this.y = y;
     this.image = i;
@@ -301,6 +318,7 @@ class Clickable{
     this.invisible = inv;
     this.animLength = a;
     this.animSpeed = as;
+    this.opacity = o;
     this.mice = false;
     if(this.image != 0){
       this.width = this.image.width;
@@ -323,7 +341,7 @@ class Clickable{
   }
 }
 class Draggable{
-  constructor(x,y,i,w,h,inv,f,a,as){
+  constructor(x,y,i,w,h,inv,f,a,as, o){
     this.x = x;
     this.y = y;
     this.image = i;
@@ -331,6 +349,7 @@ class Draggable{
     this.function = f;
     this.animLength = a;
     this.animSpeed = as;
+    this.opacity = o;
     if(this.image != 0){
       this.width = this.image.width;
       this.height = this.image.height;
@@ -360,7 +379,7 @@ class Draggable{
 }
 
 class Target{
-  constructor(x,y,i,f,r,w,h,inv,a,as){
+  constructor(x,y,i,f,r,w,h,inv,a,as, o){
     this.x = x;
     this.y = y;
     this.image = i;
@@ -369,6 +388,7 @@ class Target{
     this.invisible = inv;
     this.animLength = a;
     this.animSpeed = as;
+    this.opacity = o;
     if(this.image != 0){
       this.width = this.image.width;
       this.height = this.image.height;
@@ -391,7 +411,7 @@ class Target{
 }
 
 class Item{
-  constructor(x,y,i,f,w,h,inv,a,as){
+  constructor(x,y,i,f,w,h,inv,a,as,o){
     this.x = x;
     this.y = y;
     this.image = i;
@@ -399,6 +419,7 @@ class Item{
     this.invisible = inv;
     this.animLength = a;
     this.animSpeed = as;
+    this.opacity = o;
     if(this.image != 0){
       this.width = this.image.width;
       this.height = this.image.height;
