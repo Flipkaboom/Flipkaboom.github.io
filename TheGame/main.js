@@ -2,7 +2,7 @@
 function preload() {
   images = [];
   images.length = 0;
-  for(var i = 0; i < 75;  i++){
+  for(var i = 0; i < 77;  i++){
     images.push(loadImage("images/" + i + ".png"));
   }
   sounds = [];
@@ -58,12 +58,14 @@ function setup(){
   scenes.desert = {
     background:images[49]
   };
+  scenes.desert.info = new Item(1126,-465,images[75],function(){if(this.y < 89 && this.invisible != true){this.y += 20;}},0,0,false,0,0,255); //23
+  scenes.desert.info2 = new Item(1126,-465,images[76],function(){if(this.y < 89 && this.invisible != true){this.y += 20;}},0,0,true,0,0,255); //23
   scenes.desert.pump = new Item(0,0,images[55],function(){if(this.active != true){this.animTimer = 0;}},0,0,false,7,10,255);
   scenes.desert.oil = new Item(1406,663,images[52],0,0,0,true,2,5,225);
   scenes.desert.lever = new Clickable(1672,407,images[51],function(){this.image = images[50]; scenes.desert.pump.active = true;setTimeout(function(){scenes.desert.oil.invisible = false;},1500); setTimeout(function(){scenes.desert.oilBarrelFalling.invisible = false;},2300); setTimeout(function(){scenes.desert.arrow.invisible = false;},700);},0,0,false,0,0,255);
   scenes.desert.oilBarrelFalling = new Item(1627,-362,images[69],function(){if(this.invisible == false && this.y < 662){this.y += 30;}else if(this.invisible == false){this.invisible = true; scenes.desert.oilBarrel.invisible = false;}},0,0,true,0,0,255);
   scenes.desert.oilBarrel = new Draggable(1627,690,images[69],0,0,true,function(){if(this.invisible == true){this.x = 1627; this.y = 690;}},0,0,255);
-  scenes.desert.oilBarrelRefinery = new Item(1254,606,images[63],function(){if(this.invisible == true){this.animTimer = -1;}else if(this.currentImg == 68){this.animTimer = -1; setTimeout(function(){scenes.desert.arrowNext.invisible = false;},2000);}},0,0,true,5,10,255);
+  scenes.desert.oilBarrelRefinery = new Item(1254,606,images[63],function(){if(this.invisible == true){this.animTimer = -1;}else if(this.currentImg == 68){this.animTimer = -1; scenes.desert.info2.invisible = false; setTimeout(function(){scenes.desert.arrowNext.invisible = false;},2000);}},0,0,true,5,10,255);
   scenes.desert.arrow = new Item(1152,796,images[70],function(){if(this.invisible == true){this.animTimer = 0;}},0,0,true,3,10,255);
   scenes.desert.refineryStation = new Target(1255,611,0,function(){scenes.desert.oilBarrelRefinery.invisible = false; scenes.desert.oilBarrel.invisible = true;},scenes.desert.oilBarrel,256,351,false,0,0,255);
   scenes.desert.arrowNext = new Clickable(1734,938,images[74],function(){nextScene("distillation");},0,0,true,0,0,255);
